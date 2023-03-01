@@ -17,19 +17,21 @@ import suite.HttpSuite
 
 object ItemRoutesSuite extends HttpSuite {
 
-  def dataItems(items: List[Item]) = new TestItems {
-    override def findAll: IO[List[Item]] =
-      IO.pure(items)
-    override def findBy(brand: BrandName): IO[List[Item]] =
-      IO.pure(items.find(_.brand.name === brand).toList)
-  }
+  def dataItems(items: List[Item]) =
+    new TestItems {
+      override def findAll: IO[List[Item]] =
+        IO.pure(items)
+      override def findBy(brand: BrandName): IO[List[Item]] =
+        IO.pure(items.find(_.brand.name === brand).toList)
+    }
 
-  def failingItems(items: List[Item]) = new TestItems {
-    override def findAll: IO[List[Item]] =
-      IO.raiseError(DummyError) *> IO.pure(items)
-    override def findBy(brand: BrandName): IO[List[Item]] =
-      findAll
-  }
+  def failingItems(items: List[Item]) =
+    new TestItems {
+      override def findAll: IO[List[Item]] =
+        IO.raiseError(DummyError) *> IO.pure(items)
+      override def findBy(brand: BrandName): IO[List[Item]] =
+        findAll
+    }
 
   test("GET items succeeds") {
     forall(Gen.listOf(itemGen)) { it =>
@@ -65,9 +67,14 @@ object ItemRoutesSuite extends HttpSuite {
 }
 
 protected class TestItems extends Items[IO] {
-  def findAll: IO[List[Item]]                    = IO.pure(List.empty)
-  def findBy(brand: BrandName): IO[List[Item]]   = IO.pure(List.empty)
-  def findById(itemId: ItemId): IO[Option[Item]] = IO.pure(none[Item])
-  def create(item: CreateItem): IO[ItemId]       = ID.make[IO, ItemId]
-  def update(item: UpdateItem): IO[Unit]         = IO.unit
+  def findAll: IO[List[Item]] =
+    IO.pure(List.empty)
+  def findBy(brand: BrandName): IO[List[Item]] =
+    IO.pure(List.empty)
+  def findById(itemId: ItemId): IO[Option[Item]] =
+    IO.pure(none[Item])
+  def create(item: CreateItem): IO[ItemId] =
+    ID.make[IO, ItemId]
+  def update(item: UpdateItem): IO[Unit] =
+    IO.unit
 }

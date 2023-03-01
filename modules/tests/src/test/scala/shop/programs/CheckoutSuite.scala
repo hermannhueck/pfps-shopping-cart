@@ -25,6 +25,8 @@ import retry.RetryPolicy
 import squants.market._
 import weaver.SimpleIOSuite
 import weaver.scalacheck.Checkers
+import shop.retries.Retry
+import shop.effects.Background
 
 object CheckoutSuite extends SimpleIOSuite with Checkers {
 
@@ -118,7 +120,7 @@ object CheckoutSuite extends SimpleIOSuite with Checkers {
     forall(gen) {
       case (uid, _, oid, ct, card) =>
         Ref.of[IO, Option[GivingUp]](None).flatMap { retries =>
-          implicit val rh = TestRetry.givingUp(retries)
+          implicit val rh: Retry[IO] = TestRetry.givingUp(retries)
 
           Checkout[IO](unreachableClient, successfulCart(ct), successfulOrders(oid), retryPolicy)
             .process(uid, card)
@@ -138,9 +140,12 @@ object CheckoutSuite extends SimpleIOSuite with Checkers {
   test("failing payment client succeeds after one retry") {
     forall(gen) {
       case (uid, pid, oid, ct, card) =>
-        (Ref.of[IO, Option[WillDelayAndRetry]](None), Ref.of[IO, Int](0)).tupled.flatMap {
+        (
+          Ref.of[IO, Option[WillDelayAndRetry]](None),
+          Ref.of[IO, Int](0)
+        ).tupled.flatMap {
           case (retries, cliRef) =>
-            implicit val rh = TestRetry.recovering(retries)
+            implicit val rh: Retry[IO] = TestRetry.recovering(retries)
 
             Checkout[IO](
               recoveringClient(cliRef, pid),
@@ -165,13 +170,20 @@ object CheckoutSuite extends SimpleIOSuite with Checkers {
   test("cannot create order, run in the background") {
     forall(gen) {
       case (uid, pid, _, ct, card) =>
-        (Ref.of[IO, (Int, FiniteDuration)](0 -> 0.seconds), Ref.of[IO, Option[GivingUp]](None)).tupled.flatMap {
+        (
+          Ref.of[IO, (Int, FiniteDuration)](0 -> 0.seconds),
+          Ref.of[IO, Option[GivingUp]](None)
+        ).tupled.flatMap {
           case (bgActions, retries) =>
-            implicit val bg = TestBackground.counter(bgActions)
-            implicit val rh = TestRetry.givingUp(retries)
+            implicit val bg: Background[IO] = TestBackground.counter(bgActions)
+            implicit val reached: Retry[IO] = TestRetry.givingUp(retries)
 
-            Checkout[IO](successfulClient(pid), successfulCart(ct), failingOrders, retryPolicy)
-              .process(uid, card)
+            Checkout[IO](
+              successfulClient(pid),
+              successfulCart(ct),
+              failingOrders,
+              retryPolicy
+            ).process(uid, card)
               .attempt
               .flatMap {
                 case Left(OrderError(_)) =>

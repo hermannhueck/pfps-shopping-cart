@@ -15,15 +15,17 @@ import suite.HttpSuite
 
 object BrandRoutesSuite extends HttpSuite {
 
-  def dataBrands(brands: List[Brand]) = new TestBrands {
-    override def findAll: IO[List[Brand]] =
-      IO.pure(brands)
-  }
+  def dataBrands(brands: List[Brand]) =
+    new TestBrands {
+      override def findAll: IO[List[Brand]] =
+        IO.pure(brands)
+    }
 
-  def failingBrands(brands: List[Brand]) = new TestBrands {
-    override def findAll: IO[List[Brand]] =
-      IO.raiseError(DummyError) *> IO.pure(brands)
-  }
+  def failingBrands(brands: List[Brand]) =
+    new TestBrands {
+      override def findAll: IO[List[Brand]] =
+        IO.raiseError(DummyError) *> IO.pure(brands)
+    }
 
   test("GET brands succeeds") {
     forall(Gen.listOf(brandGen)) { b =>
@@ -44,6 +46,8 @@ object BrandRoutesSuite extends HttpSuite {
 }
 
 protected class TestBrands extends Brands[IO] {
-  def create(name: BrandName): IO[BrandId] = ID.make[IO, BrandId]
-  def findAll: IO[List[Brand]]             = IO.pure(List.empty)
+  def create(name: BrandName): IO[BrandId] =
+    ID.make[IO, BrandId]
+  def findAll: IO[List[Brand]] =
+    IO.pure(List.empty)
 }

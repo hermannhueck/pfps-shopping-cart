@@ -20,13 +20,14 @@ trait HttpSuite extends SimpleIOSuite with Checkers {
       expectedStatus: Status
   ): IO[Expectations] =
     routes.run(req).value.flatMap {
+      case None =>
+        IO.pure(failure("route not found"))
       case Some(resp) =>
         resp.asJson.map { json =>
           // Expectations form a multiplicative Monoid but we can also use other combinators like `expect.all`
           expect.same(resp.status, expectedStatus) |+| expect
             .same(json.dropNullValues, expectedBody.asJson.dropNullValues)
         }
-      case None => IO.pure(failure("route not found"))
     }
 
   def expectHttpStatus(routes: HttpRoutes[IO], req: Request[IO])(expectedStatus: Status): IO[Expectations] =
