@@ -1,6 +1,6 @@
 import Dependencies._
 
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / version := "2.0.0"
 ThisBuild / organization := "dev.profunktor"
 ThisBuild / organizationName := "ProfunKtor"
@@ -8,7 +8,9 @@ ThisBuild / organizationName := "ProfunKtor"
 ThisBuild / evictionErrorLevel := Level.Warn
 ThisBuild / scalafixDependencies += Libraries.organizeImports
 
-resolvers += Resolver.sonatypeRepo("snapshots")
+Global / semanticdbEnabled := true
+
+resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 
 val scalafixCommonSettings = inConfig(IntegrationTest)(scalafixConfigSettings(IntegrationTest))
 lazy val root = (project in file("."))
@@ -28,7 +30,7 @@ lazy val tests = (project in file("modules/tests"))
     libraryDependencies ++= Seq(
       CompilerPlugin.kindProjector,
       CompilerPlugin.betterMonadicFor,
-      CompilerPlugin.semanticDB,
+      // CompilerPlugin.semanticDB,
       Libraries.catsLaws,
       Libraries.log4catsNoOp,
       Libraries.monocleLaw,
@@ -58,7 +60,7 @@ lazy val core = (project in file("modules/core"))
     libraryDependencies ++= Seq(
       CompilerPlugin.kindProjector,
       CompilerPlugin.betterMonadicFor,
-      CompilerPlugin.semanticDB,
+      // CompilerPlugin.semanticDB,
       Libraries.cats,
       Libraries.catsEffect,
       Libraries.catsRetry,
