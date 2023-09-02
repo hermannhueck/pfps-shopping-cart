@@ -30,7 +30,7 @@ lazy val tests = (project in file("modules/tests"))
     libraryDependencies ++= Seq(
       CompilerPlugin.kindProjector,
       CompilerPlugin.betterMonadicFor,
-      // CompilerPlugin.semanticDB,
+      CompilerPlugin.semanticDB,
       Libraries.catsLaws,
       Libraries.log4catsNoOp,
       Libraries.monocleLaw,
@@ -50,7 +50,7 @@ lazy val core = (project in file("modules/core"))
     Docker / packageName := "shopping-cart",
     scalacOptions ++= List("-Ymacro-annotations", "-Yrangepos", "-Wconf:cat=unused:info"),
     scalafmtOnCompile := true,
-    resolvers += Resolver.sonatypeRepo("snapshots"),
+    resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
     Defaults.itSettings,
     scalafixCommonSettings,
     dockerBaseImage := "openjdk:11-jre-slim-buster",
@@ -60,7 +60,7 @@ lazy val core = (project in file("modules/core"))
     libraryDependencies ++= Seq(
       CompilerPlugin.kindProjector,
       CompilerPlugin.betterMonadicFor,
-      // CompilerPlugin.semanticDB,
+      CompilerPlugin.semanticDB,
       Libraries.cats,
       Libraries.catsEffect,
       Libraries.catsRetry,
