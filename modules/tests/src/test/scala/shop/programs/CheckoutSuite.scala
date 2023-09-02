@@ -18,6 +18,7 @@ import cats.data.NonEmptyList
 import cats.effect._
 import cats.effect.kernel.Ref
 import cats.implicits._
+import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.noop.NoOpLogger
 import retry.RetryDetails._
 import retry.RetryPolicies._
@@ -100,8 +101,8 @@ object CheckoutSuite extends SimpleIOSuite with Checkers {
     crd <- cardGen
   } yield (uid, pid, oid, crt, crd)
 
-  implicit val bg = TestBackground.NoOp
-  implicit val lg = NoOpLogger[IO]
+  implicit val bg: Background[IO] = TestBackground.NoOp
+  implicit val lg: Logger[IO]     = NoOpLogger[IO]
 
   test("empty cart") {
     forall(gen) {

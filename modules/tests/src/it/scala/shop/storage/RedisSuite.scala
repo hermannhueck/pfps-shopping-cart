@@ -24,13 +24,14 @@ import dev.profunktor.redis4cats.log4cats._
 import dev.profunktor.redis4cats.{ Redis, RedisCommands }
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
+import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.noop.NoOpLogger
 import pdi.jwt._
 import suite.ResourceSuite
 
 object RedisSuite extends ResourceSuite {
 
-  implicit val logger = NoOpLogger[IO]
+  implicit val logger: Logger[IO] = NoOpLogger[IO]
 
   type Res = RedisCommands[IO, String, String]
 
