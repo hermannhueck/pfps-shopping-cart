@@ -14,6 +14,7 @@ trait MkHttpClient[F[_]] {
 object MkHttpClient {
   def apply[F[_]: MkHttpClient]: MkHttpClient[F] = implicitly
 
+  @annotation.nowarn("cat=deprecation")
   implicit def forAsync[F[_]: Async]: MkHttpClient[F] =
     new MkHttpClient[F] {
       def newEmber(c: HttpClientConfig): Resource[F, Client[F]] =

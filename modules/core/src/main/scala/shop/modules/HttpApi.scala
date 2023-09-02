@@ -70,6 +70,7 @@ sealed abstract class HttpApi[F[_]: Async] private (
     version.v1 + "/admin" -> adminRoutes
   )
 
+  @annotation.nowarn("cat=deprecation")
   private val middleware: HttpRoutes[F] => HttpRoutes[F] = {
     { http: HttpRoutes[F] =>
       AutoSlash(http)

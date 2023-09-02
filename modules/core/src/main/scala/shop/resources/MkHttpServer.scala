@@ -19,6 +19,7 @@ object MkHttpServer {
   private def showEmberBanner[F[_]: Logger](s: Server): F[Unit] =
     Logger[F].info(s"\n${Banner.mkString("\n")}\nHTTP Server started at ${s.address}")
 
+  @annotation.nowarn("cat=deprecation")
   implicit def forAsyncLogger[F[_]: Async: Logger]: MkHttpServer[F] =
     new MkHttpServer[F] {
       def newEmber(cfg: HttpServerConfig, httpApp: HttpApp[F]): Resource[F, Server] =
